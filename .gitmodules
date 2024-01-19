@@ -1,0 +1,8 @@
+[submodule "piApi"]
+	path = piApi
+	url = https://github.com/Notliam99/piApi.git
+	branch = builds
+[submodule "spricklerUI"]
+	path = spricklerUI
+	url = https://github.com/Notliam99/spricklerUI.git
+	branch = builds
