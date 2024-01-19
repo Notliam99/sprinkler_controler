@@ -66,6 +66,22 @@ def sprickler_status(request):
     return json_data, 200, {'Content-Type': 'application/json'}
 
 
+@api.post('/sprinckler/toggle')
+def sprickler_toggle(request):
+    prams = parse_url_prams(request['raw_path'])
+    print(prams)
+    try:
+        if prams['id'] == 'all':
+            for i in sprincklers.keys():
+                sprincklers[i]['status'] = (not sprincklers[i]['status'])
+
+        sprincklers[prams['id']]['status'] = (
+            not sprincklers[prams['id']]['status'])
+    except Exception as e:
+        print(e)
+    return '{"woow": "w00w"}', 200
+
+
 def Main():
     api.run(80)
 
