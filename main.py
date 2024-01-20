@@ -1,24 +1,46 @@
 from piApi import Api
+from machine import Pin
 import ujson
 
 
+led = Pin("LED", Pin.OUT)
 api = Api()
 
 
 sprincklers = {
     "0": {
-        "status": False
+        "status": False,
+        "gpio": 13
     },
     "1": {
-        "status": False
+        "status": False,
+        "gpio": 14
     },
     "2": {
-        "status": False
+        "status": False,
+        "gpio": 15
     },
     "3": {
-        "status": False
+        "status": False,
+        "gpio": 16
     }
 }
+
+
+def sprinckler_switch(status):
+    for key in status.keys():
+        data = status[key]
+        pin = Pin(data["gpio"], Pin.OUT)
+        pin.value(data["status"])
+
+
+def led_indicator(func):
+    def wrapper(*args, **kwagrs):
+        led.off()
+        value = func()
+        led.on()
+        return value
+    return wrapper
 
 
 def parse_url_prams(raw_path: str) -> dict:
@@ -32,6 +54,7 @@ def parse_url_prams(raw_path: str) -> dict:
     return prams
 
 
+@led_indicator
 @api.get('/')
 def hello_world(request):
     """
@@ -53,6 +76,7 @@ def hello_world(request):
         return error, 501
 
 
+@led_indicator
 @api.get('/sprinckler/status')
 def sprickler_status(request):
     prams = parse_url_prams(request['raw_path'])
@@ -66,6 +90,7 @@ def sprickler_status(request):
     return json_data, 200, {'Content-Type': 'application/json'}
 
 
+@led_indicator
 @api.post('/sprinckler/toggle')
 def sprickler_toggle(request):
     prams = parse_url_prams(request['raw_path'])
@@ -79,10 +104,12 @@ def sprickler_toggle(request):
             not sprincklers[prams['id']]['status'])
     except Exception as e:
         print(e)
+    sprinckler_switch(sprincklers)
     return '{"woow": "w00w"}', 200
 
 
 def Main():
+    led.on()
     api.run(80)
 
 
